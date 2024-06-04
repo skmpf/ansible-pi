@@ -1,0 +1,59 @@
+- name: Install initial packages
+  become: true
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+
+- name: Add Docker's official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Set up the stable repository
+  copy:
+    content: |
+      deb [arch=arm64] https://download.docker.com/linux/debian $(lsb_release -cs) stable
+    dest: /etc/apt/sources.list.d/docker.list
+
+- name: Update apt package index
+  apt:
+    update_cache: true
+
+- name: Install Docker packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Reboot the machine to ensure Docker service starts properly
+  become: true
+  reboot:
+
+- name: Enable and start Docker service
+  become: true
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create "docker" group
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: Add user to "docker" group
+  become: true
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes

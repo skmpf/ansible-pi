@@ -1,0 +1,28 @@
+- name: Update apt-get repo and cache
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all apt packages
+  become: true
+  apt:
+    upgrade: dist
+
+- name: Install required packages
+  become: true
+  apt:
+    name:
+      - git
+      - tmux
+    state: present
+
+- name: Schedule weekly update and upgrade
+  become: true
+  cron:
+    name: "Update and upgrade"
+    minute: "0"
+    hour: "4"
+    weekday: "1"
+    job: "apt-get update -q -y && apt-get dist-upgrade -q -y"
+    user: root

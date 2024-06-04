@@ -1,0 +1,78 @@
+- name: Ensure Protocol is set to 2
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?Protocol"
+    line: "Protocol 2"
+    state: present
+
+- name: Disable Password Authentication
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+
+- name: Disable PermitEmptyPasswords
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
+    state: present
+
+- name: Disable Root Login
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+
+- name: Set MaxAuthTries to 3
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?MaxAuthTries"
+    line: "MaxAuthTries 3"
+    state: present
+
+- name: Disable ChallengeResponseAuthentication
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?ChallengeResponseAuthentication"
+    line: "ChallengeResponseAuthentication no"
+    state: present
+
+- name: Disable UsePAM
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?UsePAM"
+    line: "UsePAM no"
+    state: present
+
+- name: Enable PubkeyAuthentication
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PubkeyAuthentication"
+    line: "PubkeyAuthentication yes"
+    state: present
+
+- name: Enable X11Forwarding
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?X11Forwarding"
+    line: "X11Forwarding yes"
+    state: present
+
+- name: Restart sshd service to apply changes
+  become: true
+  service:
+    name: sshd
+    state: restarted
+    enabled: yes
