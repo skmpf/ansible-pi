@@ -1,7 +1,17 @@
-- name: Setup Git global configuration
+- name: Setup editor
   git_config:
+    name: core.editor
     scope: global
-  with_items:
-    - { name: "core.editor", value: "{{ editor }}" }
-    - { name: "user.email", value: "{{ git_user_email }}" }
-    - { name: "user.name", value: "{{ git_user_name }}" }
+    value: "{{ editor}}"
+
+- name: Setup name
+  git_config:
+    name: user.name
+    scope: global
+    value: "{{ git_user_name }}"
+
+- name: Setup email
+  git_config:
+    name: user.email
+    scope: global
+    value: "{{ git_user_email }}"

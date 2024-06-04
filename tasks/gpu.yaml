@@ -1,4 +1,5 @@
 - name: Reduce GPU RAM allocation
+  become: true
   lineinfile:
     path: /boot/config.txt
     regexp: "^gpu_mem="

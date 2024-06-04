@@ -21,4 +21,4 @@
   become: true
   command: zerotier-cli listnetworks
   register: result
-  changed_when: "'{{ zerotier_network_id }}' not in result.stdout"
+  changed_when: "'zerotier_network_id' not in result.stdout"
