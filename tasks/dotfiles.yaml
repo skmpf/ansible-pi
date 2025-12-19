@@ -1,0 +1,80 @@
+---
+- name: Setup dotfiles
+  block:
+    - name: Install stow for dotfiles management
+      become: true
+      ansible.builtin.apt:
+        name: stow
+        state: present
+
+    - name: Ensure local bin directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_user_dir }}/.local/bin"
+        state: directory
+        mode: "0755"
+
+    - name: Add local bin to PATH in .zshrc
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_user_dir }}/.zshrc"
+        line: "export PATH=$HOME/.local/bin:$PATH"
+        create: yes
+        state: present
+
+    - name: Check if dotfiles directory exists
+      ansible.builtin.stat:
+        path: "{{ ansible_user_dir }}/.dotfiles"
+      register: dotfiles_check
+      changed_when: false
+
+    - name: Clone dotfiles repository
+      ansible.builtin.git:
+        repo: "{{ dotfiles_repo }}"
+        dest: "{{ ansible_user_dir }}/.dotfiles"
+        version: main
+      when: dotfiles_check.stat.exists == false
+
+    - name: Install Oh My Posh to /usr/local/bin
+      become: true
+      ansible.builtin.shell: |
+        curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
+      args:
+        creates: /usr/local/bin/oh-my-posh
+
+    - name: Install Zoxide to local bin
+      ansible.builtin.shell: |
+        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+      args:
+        creates: "{{ ansible_user_dir }}/.local/bin/zoxide"
+
+    - name: Backup existing dotfiles that would conflict
+      ansible.builtin.shell: |
+        for file in .gitconfig .zshrc .ohmyposh.toml; do
+          if [ -f "{{ ansible_user_dir }}/$file" ] && [ ! -L "{{ ansible_user_dir }}/$file" ]; then
+            mv "{{ ansible_user_dir }}/$file" "{{ ansible_user_dir }}/$file.backup.$(date +%Y%m%d%H%M%S)"
+          fi
+        done
+
+    - name: Create symlinks with stow
+      ansible.builtin.command: stow -d {{ ansible_user_dir }}/.dotfiles -t {{ ansible_user_dir }} .
+      args:
+        chdir: "{{ ansible_user_dir }}/.dotfiles"
+      register: stow_result
+      changed_when: "'LINK' in stow_result.stderr or 'UNLINK' in stow_result.stderr"
+
+    - name: Set zsh as default shell
+      become: true
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        shell: /bin/zsh
+      when: ansible_user_shell != "/bin/zsh"
+
+  when: install_dotfiles | default(false) | bool
+
+  rescue:
+    - name: Dotfiles setup failed
+      ansible.builtin.debug:
+        msg: "Failed to setup dotfiles. Please check the error messages above."
+
+    - name: Fail the playbook
+      ansible.builtin.fail:
+        msg: "Dotfiles setup failed"

@@ -1,23 +1,18 @@
 ---
 - name: Setup Raspberry Pi
   hosts: myhosts
-  become: true
   gather_facts: true
   vars:
-    editor: vim
-    git_user_name: Your Name
-    git_user_email: your.email@example.com
     ssh_port: 22 # Set to a different port for additional security
-    install_zerotier: true # Set to false to skip ZeroTier installation
+    install_zerotier: false # Set to false to skip ZeroTier installation
     zerotier_network_id: your_zerotier_network_id
+    install_dotfiles: false # Set to true to setup dotfiles from repository
+    dotfiles_repo: https://github.com/skmpf/dotfiles.git # Repository to clone dotfiles from
+
   tasks:
     - name: Initial system setup
       ansible.builtin.include_tasks:
         file: tasks/initial_setup.yaml
-
-    - name: Configure Git
-      ansible.builtin.include_tasks:
-        file: tasks/git.yaml
 
     - name: Secure SSH configuration
       ansible.builtin.include_tasks:
@@ -31,3 +26,8 @@
       ansible.builtin.include_tasks:
         file: tasks/zerotier.yaml
       when: install_zerotier | default(true) | bool
+
+    - name: Setup dotfiles
+      ansible.builtin.include_tasks:
+        file: tasks/dotfiles.yaml
+      when: install_dotfiles | default(false) | bool

@@ -16,6 +16,11 @@
     name:
       - git
       - tmux
+      - zsh
+      - curl
+      - wget
+      - fzf
+      - unzip
     state: present
 
 - name: Schedule weekly update and upgrade

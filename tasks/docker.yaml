@@ -8,24 +8,28 @@
       changed_when: false
 
     - name: Ensure apt cache is updated
+      become: true
       ansible.builtin.apt:
         update_cache: yes
         cache_valid_time: 3600
       when: docker_check.rc != 0
 
     - name: Install Docker from default repositories
+      become: true
       ansible.builtin.apt:
         name: docker.io
         state: present
       when: docker_check.rc != 0
 
     - name: Add user to docker group
+      become: true
       ansible.builtin.user:
         name: "{{ ansible_user }}"
         groups: docker
         append: yes
 
     - name: Ensure Docker service is enabled and started
+      become: true
       ansible.builtin.service:
         name: docker
         state: started

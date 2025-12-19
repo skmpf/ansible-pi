@@ -7,10 +7,10 @@ Set up your RPI from scratch with only one command.
 This repository contains Ansible tasks needed to set up the following modules on RPI:
 
 - System updates and essential packages
-- Git configuration
 - SSH hardening with security best practices
+- Docker from OS repositories (works on Raspberry Pi OS and Ubuntu)
 - ZeroTier VPN (optional)
-- Docker from OS repositories
+- Dotfiles setup (optional)
 
 ## Getting started
 
@@ -44,12 +44,11 @@ cd ansible-pi
 2. Edit the `playbook.yaml` file to update the variables:
    ```yaml
    vars:
-     editor: vim
-     git_user_name: Your Name
-     git_user_email: your.email@example.com
      ssh_port: 22 # Optional: Change to a different port for additional security
-     install_zerotier: true # Set to false to skip ZeroTier installation
+     install_zerotier: false # Set to true to setup ZeroTier
      zerotier_network_id: your_zerotier_network_id # Required if install_zerotier is true
+     install_dotfiles: false # Set to true to setup dotfiles from repository
+     dotfiles_repo: https://github.com/your-username/dotfiles.git # Repository to clone dotfiles from
    ```
 
 ### Execution
@@ -73,4 +72,5 @@ This will install the required packages and configure the Raspberry Pi.
 ### Optional Configurations
 
 **Change SSH Port**: Modify `ssh_port` in playbook.yaml (default: 22)
-**Skip ZeroTier**: Set `install_zerotier` to false in playbook.yaml if you don't need VPN access
+**Skip ZeroTier**: Set `install_zerotier` to true in playbook.yaml if you need VPN access
+**Setup Dotfiles**: Set `install_dotfiles` to true in playbook.yaml and provide your dotfiles repository URL in `dotfiles_repo`
