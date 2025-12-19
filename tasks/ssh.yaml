@@ -28,7 +28,7 @@
     - { regexp: "ClientAliveCountMax", line: "ClientAliveCountMax 2" }
     - { regexp: "UsePAM", line: "UsePAM yes" }
     - { regexp: "X11Forwarding", line: "X11Forwarding no" }
-    - { regexp: "AllowTcpForwarding", line: "AllowTcpForwarding no" }
+    - { regexp: "AllowTcpForwarding", line: "AllowTcpForwarding yes" }
 
 - name: Test SSH configuration syntax
   become: true
