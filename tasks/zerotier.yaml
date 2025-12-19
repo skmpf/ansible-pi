@@ -1,24 +1,25 @@
+---
 - name: Download ZeroTier install script
   become: true
-  get_url:
+  ansible.builtin.get_url:
     url: https://install.zerotier.com
     dest: /tmp/install_zerotier.sh
     mode: 0755
 
 - name: Run ZeroTier install script
   become: true
-  command: /tmp/install_zerotier.sh
+  ansible.builtin.command: /tmp/install_zerotier.sh
   args:
     creates: /var/lib/zerotier-one
 
 - name: Join ZeroTier network
   become: true
-  command: zerotier-cli join "{{ zerotier_network_id }}"
+  ansible.builtin.command: zerotier-cli join "{{ zerotier_network_id }}"
   args:
     creates: /var/lib/zerotier-one/networks.d/{{ zerotier_network_id }}.conf
 
 - name: Verify ZeroTier network join
   become: true
-  command: zerotier-cli listnetworks
+  ansible.builtin.command: zerotier-cli listnetworks
   register: result
-  changed_when: "'zerotier_network_id' not in result.stdout"
+  changed_when: "'{{ zerotier_network_id }}' not in result.stdout"

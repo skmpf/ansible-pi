@@ -1,17 +1,18 @@
+---
 - name: Update apt-get repo and cache
   become: true
-  apt:
+  ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: 3600
 
 - name: Upgrade all apt packages
   become: true
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
 
 - name: Install required packages
   become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - git
       - tmux
@@ -19,10 +20,10 @@
 
 - name: Schedule weekly update and upgrade
   become: true
-  cron:
-    name: "Update and upgrade"
+  ansible.builtin.cron:
+    name: "Automatic system updates"
     minute: "0"
     hour: "4"
-    weekday: "1"
-    job: "apt-get update -q -y && apt-get dist-upgrade -q -y"
+    weekday: "0"
+    job: "apt-get update -qq && apt-get dist-upgrade -qq -y"
     user: root

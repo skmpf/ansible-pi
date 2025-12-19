@@ -1,78 +1,51 @@
-- name: Ensure Protocol is set to 2
+---
+- name: Backup SSH configuration
   become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?Protocol"
-    line: "Protocol 2"
-    state: present
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.bak
+    remote_src: yes
+    backup: yes
 
-- name: Disable Password Authentication
+- name: Apply SSH hardening settings
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "^#?PasswordAuthentication"
-    line: "PasswordAuthentication no"
+    regexp: "^#?{{ item.regexp }}"
+    line: "{{ item.line }}"
     state: present
+  loop:
+    - { regexp: "Port", line: "Port {{ ssh_port }}" }
+    - { regexp: "Protocol", line: "Protocol 2" }
+    - { regexp: "PermitRootLogin", line: "PermitRootLogin no" }
+    - { regexp: "PasswordAuthentication", line: "PasswordAuthentication no" }
+    - { regexp: "PermitEmptyPasswords", line: "PermitEmptyPasswords no" }
+    - regexp: "PubkeyAuthentication"
+      line: "PubkeyAuthentication yes"
+    - { regexp: "MaxAuthTries", line: "MaxAuthTries 3" }
+    - { regexp: "MaxStartups", line: "MaxStartups 10:30:60" }
+    - { regexp: "ClientAliveInterval", line: "ClientAliveInterval 300" }
+    - { regexp: "ClientAliveCountMax", line: "ClientAliveCountMax 2" }
+    - { regexp: "UsePAM", line: "UsePAM yes" }
+    - { regexp: "X11Forwarding", line: "X11Forwarding no" }
+    - { regexp: "AllowTcpForwarding", line: "AllowTcpForwarding no" }
 
-- name: Disable PermitEmptyPasswords
+- name: Test SSH configuration syntax
   become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?PermitEmptyPasswords"
-    line: "PermitEmptyPasswords no"
-    state: present
+  ansible.builtin.command: sshd -t
+  register: sshd_test
+  changed_when: false
 
-- name: Disable Root Login
+- name: Restart SSH service to apply changes
   become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?PermitRootLogin"
-    line: "PermitRootLogin no"
-    state: present
-
-- name: Set MaxAuthTries to 3
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?MaxAuthTries"
-    line: "MaxAuthTries 3"
-    state: present
-
-- name: Disable ChallengeResponseAuthentication
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?ChallengeResponseAuthentication"
-    line: "ChallengeResponseAuthentication no"
-    state: present
-
-- name: Disable UsePAM
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?UsePAM"
-    line: "UsePAM no"
-    state: present
-
-- name: Enable PubkeyAuthentication
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?PubkeyAuthentication"
-    line: "PubkeyAuthentication yes"
-    state: present
-
-- name: Enable X11Forwarding
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "^#?X11Forwarding"
-    line: "X11Forwarding yes"
-    state: present
-
-- name: Restart sshd service to apply changes
-  become: true
-  service:
-    name: sshd
+  ansible.builtin.systemd:
+    name: ssh
     state: restarted
     enabled: yes
+  when: sshd_test.rc == 0
+
+- name: Verify SSH is listening
+  ansible.builtin.wait_for:
+    port: "{{ ssh_port }}"
+    delay: 5
+    timeout: 15

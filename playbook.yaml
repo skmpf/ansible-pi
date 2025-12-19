@@ -1,27 +1,33 @@
-- name: Setup
+---
+- name: Setup Raspberry Pi
   hosts: myhosts
+  become: true
+  gather_facts: true
   vars:
     editor: vim
     git_user_name: Your Name
     git_user_email: your.email@example.com
+    ssh_port: 22 # Set to a different port for additional security
+    install_zerotier: true # Set to false to skip ZeroTier installation
     zerotier_network_id: your_zerotier_network_id
   tasks:
-    - name: Initial setup
+    - name: Initial system setup
       ansible.builtin.include_tasks:
         file: tasks/initial_setup.yaml
 
-    - name: Git
+    - name: Configure Git
       ansible.builtin.include_tasks:
         file: tasks/git.yaml
 
-    - name: SSH
+    - name: Secure SSH configuration
       ansible.builtin.include_tasks:
         file: tasks/ssh.yaml
 
-    - name: ZeroTier
-      ansible.builtin.include_tasks:
-        file: tasks/zerotier.yaml
-
-    - name: Docker
+    - name: Install Docker CE
       ansible.builtin.include_tasks:
         file: tasks/docker.yaml
+
+    - name: Install and configure ZeroTier
+      ansible.builtin.include_tasks:
+        file: tasks/zerotier.yaml
+      when: install_zerotier | default(true) | bool

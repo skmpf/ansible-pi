@@ -1,17 +1,18 @@
+---
 - name: Setup editor
-  git_config:
+  ansible.builtin.git_config:
     name: core.editor
     scope: global
     value: "{{ editor}}"
 
 - name: Setup name
-  git_config:
+  ansible.builtin.git_config:
     name: user.name
     scope: global
     value: "{{ git_user_name }}"
 
 - name: Setup email
-  git_config:
+  ansible.builtin.git_config:
     name: user.email
     scope: global
     value: "{{ git_user_email }}"

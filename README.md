@@ -6,11 +6,11 @@ Set up your RPI from scratch with only one command.
 
 This repository contains Ansible tasks needed to set up the following modules on RPI:
 
-- periodical auto-updates
-- Git config
-- secure SSH config
-- ZeroTier
-- Docker
+- System updates and essential packages
+- Git configuration
+- SSH hardening with security best practices
+- ZeroTier VPN (optional)
+- Docker from OS repositories
 
 ## Getting started
 
@@ -20,7 +20,7 @@ This repository contains Ansible tasks needed to set up the following modules on
 - Ensure that your public SSH key is added to the authorized_keys file on each host (managed node) during the microSD installation process or by using the below command:
 
 ```bash
-ssh-copy-id -i ~/.ssh/<mykey> <user>@<host>
+ssh-copy-id -i ~/.ssh/mykey user@host
 ```
 
 ### Setup
@@ -47,7 +47,9 @@ cd ansible-pi
      editor: vim
      git_user_name: Your Name
      git_user_email: your.email@example.com
-     zerotier_network_id: your_zerotier_network_id
+     ssh_port: 22 # Optional: Change to a different port for additional security
+     install_zerotier: true # Set to false to skip ZeroTier installation
+     zerotier_network_id: your_zerotier_network_id # Required if install_zerotier is true
    ```
 
 ### Execution
@@ -65,3 +67,10 @@ ansible-playbook -i inventory.ini playbook.yaml -vv
 ```
 
 This will install the required packages and configure the Raspberry Pi.
+
+**Note**: If you change the SSH port from the default 22, remember to update your SSH connection command accordingly and your `inventory.ini` file.
+
+### Optional Configurations
+
+**Change SSH Port**: Modify `ssh_port` in playbook.yaml (default: 22)
+**Skip ZeroTier**: Set `install_zerotier` to false in playbook.yaml if you don't need VPN access
