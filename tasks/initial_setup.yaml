@@ -16,7 +16,6 @@
     name:
       - git
       - tmux
-      - zsh
       - curl
       - wget
       - fzf

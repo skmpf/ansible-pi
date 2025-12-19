@@ -13,21 +13,31 @@
     - name: Initial system setup
       ansible.builtin.include_tasks:
         file: tasks/initial_setup.yaml
+      tags:
+        - initial_setup
 
     - name: Secure SSH configuration
       ansible.builtin.include_tasks:
         file: tasks/ssh.yaml
+      tags:
+        - ssh
 
     - name: Install Docker CE
       ansible.builtin.include_tasks:
         file: tasks/docker.yaml
+      tags:
+        - docker
 
     - name: Install and configure ZeroTier
       ansible.builtin.include_tasks:
         file: tasks/zerotier.yaml
       when: install_zerotier | default(true) | bool
+      tags:
+        - zerotier
 
     - name: Setup dotfiles
       ansible.builtin.include_tasks:
         file: tasks/dotfiles.yaml
       when: install_dotfiles | default(false) | bool
+      tags:
+        - dotfiles

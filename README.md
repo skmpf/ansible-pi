@@ -69,6 +69,38 @@ This will install the required packages and configure the Raspberry Pi.
 
 **Note**: If you change the SSH port from the default 22, remember to update your SSH connection command accordingly and your `inventory.ini` file.
 
+### Running Specific Tasks
+
+You can run specific tasks using tags. Available tags:
+
+- **initial_setup**: System updates and base packages
+- **ssh**: SSH hardening and security configuration
+- **docker**: Docker installation from official repository
+- **zerotier**: ZeroTier VPN installation and configuration
+- **dotfiles**: Dotfiles setup with stow, Oh My Posh, and zsh
+
+Examples:
+
+```bash
+# Run only initial system setup
+ansible-playbook -i inventory.ini playbook.yaml --tags initial_setup
+
+# Run only SSH hardening
+ansible-playbook -i inventory.ini playbook.yaml --tags ssh
+
+# Run only Docker installation
+ansible-playbook -i inventory.ini playbook.yaml --tags docker
+
+# Run only ZeroTier setup
+ansible-playbook -i inventory.ini playbook.yaml --tags zerotier
+
+# Run only dotfiles setup
+ansible-playbook -i inventory.ini playbook.yaml --tags dotfiles
+
+# Run multiple specific tasks
+ansible-playbook -i inventory.ini playbook.yaml --tags docker,dotfiles
+```
+
 ### Optional Configurations
 
 **Change SSH Port**: Modify `ssh_port` in playbook.yaml (default: 22)

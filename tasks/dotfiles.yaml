@@ -1,10 +1,12 @@
 ---
 - name: Setup dotfiles
   block:
-    - name: Install stow for dotfiles management
+    - name: Install zsh and stow for dotfiles management
       become: true
       ansible.builtin.apt:
-        name: stow
+        name:
+          - zsh
+          - stow
         state: present
 
     - name: Ensure local bin directory exists
