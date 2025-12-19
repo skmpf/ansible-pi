@@ -7,13 +7,10 @@ Set up your RPI from scratch with only one command.
 This repository contains Ansible tasks needed to set up the following modules on RPI:
 
 - periodical auto-updates
-- bigger SWAP
-- smaller GPU memory
 - Git config
 - secure SSH config
 - ZeroTier
 - Docker
-- personal projects (optional)
 
 ## Getting started
 
@@ -23,7 +20,7 @@ This repository contains Ansible tasks needed to set up the following modules on
 - Ensure that your public SSH key is added to the authorized_keys file on each host (managed node) during the microSD installation process or by using the below command:
 
 ```bash
-ssh-copy-id -i ~/.ssh/mykey user@host
+ssh-copy-id -i ~/.ssh/<mykey> <user>@<host>
 ```
 
 ### Setup
@@ -35,8 +32,23 @@ git clone https://github.com/skmpf/ansible-pi.git
 cd ansible-pi
 ```
 
-Edit the `inventory.ini` file to update the hostname or IP if necessary and the `ansible_user` variable for each host.
-Edit the `playbook.yaml` file to update the variables for your setup.
+### Setup
+
+1. Edit the `inventory.ini` file with your Raspberry Pi connection details:
+
+   ```ini
+   [myhosts]
+   your-pi-ip-or-hostname ansible_user=your_username ansible_ssh_private_key_file=~/.ssh/your_key
+   ```
+
+2. Edit the `playbook.yaml` file to update the variables:
+   ```yaml
+   vars:
+     editor: vim
+     git_user_name: Your Name
+     git_user_email: your.email@example.com
+     zerotier_network_id: your_zerotier_network_id
+   ```
 
 ### Execution
 

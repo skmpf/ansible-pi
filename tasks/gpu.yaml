@@ -1,7 +1,0 @@
-- name: Reduce GPU RAM allocation
-  become: true
-  lineinfile:
-    path: /boot/config.txt
-    regexp: "^gpu_mem="
-    line: "gpu_mem={{ gpu_mem_mb }}"
-    create: yes
