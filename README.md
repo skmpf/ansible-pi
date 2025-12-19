@@ -8,7 +8,7 @@ This repository contains Ansible tasks needed to set up the following modules on
 
 - System updates and essential packages
 - SSH hardening with security best practices
-- Docker from OS repositories (works on Raspberry Pi OS and Ubuntu)
+- Docker from official Docker repository with fallback to OS repositories (works on Raspberry Pi OS and Ubuntu)
 - ZeroTier VPN (optional)
 - Dotfiles setup (optional)
 
