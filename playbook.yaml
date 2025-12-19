@@ -4,8 +4,8 @@
   gather_facts: true
   vars:
     ssh_port: 22 # Set to a different port for additional security
-    install_zerotier: false # Set to false to skip ZeroTier installation
-    zerotier_network_id: your_zerotier_network_id
+    install_zerotier: false # Set to true to install ZeroTier VPN
+    zerotier_network_id: your_zerotier_network_id # Required if install_zerotier is true
     install_dotfiles: false # Set to true to setup dotfiles from repository
     dotfiles_repo: https://github.com/skmpf/dotfiles.git # Repository to clone dotfiles from
 

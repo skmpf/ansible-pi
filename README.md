@@ -17,11 +17,25 @@ This repository contains Ansible tasks needed to set up the following modules on
 ### Prerequisites
 
 - Ansible installed on your local machine (control node)
-- Ensure that your public SSH key is added to the authorized_keys file on each host (managed node) during the microSD installation process or by using the below command:
+- SSH key-based authentication configured on your Raspberry Pi
+
+**IMPORTANT**: Before running the playbook, ensure your SSH public key is added to the Raspberry Pi's `authorized_keys` file. This is critical because the playbook will disable password authentication for security.
+
+You can add your SSH key in one of two ways:
+
+1. **During microSD setup**: Use Raspberry Pi Imager to configure SSH and add your public key
+2. **After first boot**: Copy your SSH key manually:
+   ```bash
+   ssh-copy-id -i ~/.ssh/id_rsa pi@raspberrypi.local
+   ```
+
+To verify SSH key authentication is working before running the playbook:
 
 ```bash
-ssh-copy-id -i ~/.ssh/mykey user@host
+ssh -i ~/.ssh/id_rsa pi@raspberrypi.local
 ```
+
+If you can connect without entering a password, you're ready to proceed.
 
 ### Setup
 
@@ -45,7 +59,7 @@ cd ansible-pi
    ```yaml
    vars:
      ssh_port: 22 # Optional: Change to a different port for additional security
-     install_zerotier: false # Set to true to setup ZeroTier
+     install_zerotier: false # Set to true to install ZeroTier VPN
      zerotier_network_id: your_zerotier_network_id # Required if install_zerotier is true
      install_dotfiles: false # Set to true to setup dotfiles from repository
      dotfiles_repo: https://github.com/your-username/dotfiles.git # Repository to clone dotfiles from
@@ -67,7 +81,10 @@ ansible-playbook -i inventory.ini playbook.yaml -vv
 
 This will install the required packages and configure the Raspberry Pi.
 
-**Note**: If you change the SSH port from the default 22, remember to update your SSH connection command accordingly and your `inventory.ini` file.
+**Important Notes**:
+
+- If you change the SSH port from the default 22, remember to update your SSH connection command accordingly and your `inventory.ini` file.
+- After Docker installation, you'll need to log out and log back in (or start a new SSH session) for the docker group membership to take effect. Alternatively, run `newgrp docker` to activate the group in your current session.
 
 ### Running Specific Tasks
 
@@ -104,5 +121,5 @@ ansible-playbook -i inventory.ini playbook.yaml --tags docker,dotfiles
 ### Optional Configurations
 
 **Change SSH Port**: Modify `ssh_port` in playbook.yaml (default: 22)
-**Skip ZeroTier**: Set `install_zerotier` to true in playbook.yaml if you need VPN access
+**Install ZeroTier**: Set `install_zerotier` to true in playbook.yaml and provide your network ID in `zerotier_network_id` if you need VPN access
 **Setup Dotfiles**: Set `install_dotfiles` to true in playbook.yaml and provide your dotfiles repository URL in `dotfiles_repo`

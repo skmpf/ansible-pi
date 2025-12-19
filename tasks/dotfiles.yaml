@@ -1,5 +1,6 @@
 ---
 - name: Setup dotfiles
+  when: install_dotfiles | default(false) | bool
   block:
     - name: Install zsh and stow for dotfiles management
       become: true
@@ -57,7 +58,7 @@
         done
 
     - name: Create symlinks with stow
-      ansible.builtin.command: stow -d {{ ansible_user_dir }}/.dotfiles -t {{ ansible_user_dir }} .
+      ansible.builtin.command: stow --restow -d {{ ansible_user_dir }}/.dotfiles -t {{ ansible_user_dir }} .
       args:
         chdir: "{{ ansible_user_dir }}/.dotfiles"
       register: stow_result
@@ -69,8 +70,6 @@
         name: "{{ ansible_user }}"
         shell: /bin/zsh
       when: ansible_user_shell != "/bin/zsh"
-
-  when: install_dotfiles | default(false) | bool
 
   rescue:
     - name: Dotfiles setup failed
