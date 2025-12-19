@@ -21,6 +21,7 @@
       - wget
       - fzf
       - unzip
+      - mosh
     state: present
 
 - name: Schedule weekly update and upgrade
